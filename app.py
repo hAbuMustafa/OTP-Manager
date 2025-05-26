@@ -2,9 +2,8 @@ from cs50 import SQL
 from flask import Flask, flash, render_template, request, redirect, session
 from flask_session import Session
 from helpers import login_required, logged_out_only
-from encryption import encrypt, decrypt
+from encryption import encrypt_secrets, decrypt_secrets, encrypt, decrypt
 import re
-from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
 
@@ -58,13 +57,14 @@ def login():
 
         # Decrypt secrets, if the the first return is True, then redirect to the Home page and forward decrypted secrets to the Home page, otherwise, redirect to the login page with error message
 
-        user_matched, secrets = decrypt(username, password, rows[0]["s"])
+        user_matched, secrets = decrypt_secrets(username, password, rows[0]["s"])
         if not user_matched:
             flash("Invalid username or password", "error")
             return render_template("login.html"), 403
 
         session["user_id"] = rows[0]["id"]
         session["s"] = secrets
+        session["p"] = encrypt(password, rows[0]["s"])
 
         return redirect("/")
     elif request.method == "GET":
@@ -100,7 +100,7 @@ def register():
             )
             return render_template("register.html"), 403
 
-        s = encrypt(username, password)
+        s = encrypt_secrets(username, password)
 
         try:
             new_user_id = db.execute(
@@ -119,3 +119,89 @@ def register():
             return redirect("/")
     elif request.method == "GET":
         return render_template("register.html")
+
+
+@app.route("/add_secret", methods=["GET", "POST"])
+@login_required
+def add_secret():
+    if request.method == "POST":
+        issuer = request.form.get("issuer")
+        account = request.form.get("account")
+        secret = request.form.get("secret")
+        otp_type = request.form.get("otp_type", "totp")  # optional
+        algorithm = request.form.get("algorithm", "SHA1")  # optional
+        digits = request.form.get("digits", "6")  # optional
+        period = request.form.get("period", "30")  # optional
+        counter = request.form.get("counter", "0")  # optional
+
+        if not issuer:
+            flash(
+                "Please provide a name to label your code with (service/website/application name at least)",
+                "error",
+            )
+            return render_template("add_secret.html"), 403
+
+        if not secret:
+            flash(
+                "Please, provide a secret and the OTP type",
+                "error",
+            )
+            return render_template("add_secret.html"), 403
+
+        if otp_type not in ["totp", "hotp"]:
+            flash("Invalid OTP type", "error")
+            return render_template("add_secret.html"), 403
+
+        if algorithm not in ["SHA1", "SHA256", "SHA512"]:
+            flash(
+                "Invalid algorithm chosen. Please, select from the provided list of standard algorithms",
+                "error",
+            )
+            return render_template("add_secret.html"), 403
+
+        if digits not in ["6", "7", "8"]:
+            flash("Invalid OTP number of digits", "error")
+            return render_template("add_secret.html"), 403
+
+        if period not in ["15", "30", "60"]:
+            flash("Invalid period", "error")
+            return render_template("add_secret.html"), 403
+
+        try:
+            counter = int(counter)
+        except ValueError:
+            flash("Invalid counter", "error")
+            return render_template("add_secret.html"), 403
+
+        new_secret = {
+            "issuer": issuer,
+            "account": account,
+            "secret_key": secret,
+            "otp_type": otp_type,
+        }
+
+        user_data = db.execute(
+            "SELECT * FROM users WHERE id = :user_id;", user_id=session["user_id"]
+        )
+
+        session["s"].append(new_secret)
+
+        password = decrypt(session["p"], user_data["s"])
+
+        print(password)
+
+        new_encrypted_secrets = encrypt_secrets(
+            user_data["username"], password, session["s"]
+        )
+
+        db.execute(
+            "UPDATE TABLE users (s) VALUES (:s) WHERE id = :user_id;",
+            user_id=session["user_id"],
+            s=new_encrypted_secrets,
+        )
+
+        session["p"] = encrypt(password, new_encrypted_secrets)
+        flash("Secret added successfully", "success")
+        return redirect("/")
+    elif request.method == "GET":
+        return render_template("add_secret.html")

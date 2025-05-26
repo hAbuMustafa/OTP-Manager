@@ -4,6 +4,9 @@ from flask_session import Session
 from helpers import login_required, logged_out_only
 from encryption import encrypt_secrets, decrypt_secrets, encrypt, decrypt
 import re
+from pyotp import TOTP, HOTP
+from time import time
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
@@ -29,10 +32,69 @@ def after_request(response):
     return response
 
 
+def digest_secrets(secret: dict):
+    if (
+        secret == ""
+    ):  # fix: this by adding FILTERED secrets to session on LOGIN that do not contain mere strings
+        return
+
+    otp = (
+        TOTP(
+            secret["secret_key"],
+            digits=int(secret["digits"]),
+            interval=int(secret["period"]),
+            issuer=secret["issuer"],
+            name=secret["account"],
+            digest=secret["algorithm"],
+        ).now()
+        if secret["otp_type"] == "totp"
+        else HOTP(
+            secret["secret_key"],
+            digits=int(secret["digits"]),
+            issuer=secret["issuer"],
+            name=secret["account"],
+            digest=secret["algorithm"],
+            initial_count=int(secret["counter"]),
+        ).at(int(secret["counter"]))
+    )
+
+    interval = int(secret["period"]) if secret["otp_type"] == "totp" else None
+    remaining_seconds = interval - (time() % interval) if interval else None
+
+    ends_at = (
+        (datetime.now() + timedelta(seconds=remaining_seconds)).strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+        if secret["otp_type"] == "totp"
+        else None
+    )
+
+    counter = int(secret["counter"]) if secret["otp_type"] == "hotp" else None
+
+    return {
+        "issuer": secret["issuer"],
+        "account": secret["account"],
+        "otp_type": secret["otp_type"],
+        "otp": otp,
+        "ends_at": ends_at,
+        "remaining_seconds": remaining_seconds,
+        "counter": counter,
+    }
+
+
 @app.route("/")
 @login_required
 def index():
-    return render_template("index.html", s=session["s"])
+    OTPs = list(
+        map(
+            digest_secrets,
+            session["s"],
+        )
+    )
+    # todo: get the lowest "remaining_seconds" from OTPs
+    # todo: pass it as a variable to the template
+    # todo: refresh the page after that time using JS
+    return render_template("index.html", s=OTPs)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -61,7 +123,6 @@ def login():
         if not user_matched:
             flash("Invalid username or password", "error")
             return render_template("login.html"), 403
-        print(secrets)
         session["user_id"] = rows[0]["id"]
         session["s"] = secrets
         session["p"] = encrypt(password, str(rows[0]["s"]))
@@ -192,8 +253,6 @@ def add_secret():
 
         password = decrypt(session["p"], str(user_data[0]["s"]))
 
-        print(password)
-
         new_encrypted_secrets = encrypt_secrets(
             user_data[0]["username"], password, str(session["s"])
         )
@@ -209,3 +268,10 @@ def add_secret():
         return redirect("/")
     elif request.method == "GET":
         return render_template("add_secret.html")
+
+
+@app.route("/next_counter", methods=["POST"])
+@login_required
+def next_counter():
+    # todo: implement this function
+    return redirect("/")

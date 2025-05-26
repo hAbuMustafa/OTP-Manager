@@ -57,14 +57,14 @@ def login():
 
         # Decrypt secrets, if the the first return is True, then redirect to the Home page and forward decrypted secrets to the Home page, otherwise, redirect to the login page with error message
 
-        user_matched, secrets = decrypt_secrets(username, password, rows[0]["s"])
+        user_matched, secrets = decrypt_secrets(username, password, str(rows[0]["s"]))
         if not user_matched:
             flash("Invalid username or password", "error")
             return render_template("login.html"), 403
-
+        print(secrets)
         session["user_id"] = rows[0]["id"]
         session["s"] = secrets
-        session["p"] = encrypt(password, rows[0]["s"])
+        session["p"] = encrypt(password, str(rows[0]["s"]))
 
         return redirect("/")
     elif request.method == "GET":
@@ -178,6 +178,10 @@ def add_secret():
             "account": account,
             "secret_key": secret,
             "otp_type": otp_type,
+            "algorithm": algorithm,
+            "digits": digits,
+            "period": period,
+            "counter": counter,
         }
 
         user_data = db.execute(
@@ -186,21 +190,21 @@ def add_secret():
 
         session["s"].append(new_secret)
 
-        password = decrypt(session["p"], user_data["s"])
+        password = decrypt(session["p"], str(user_data[0]["s"]))
 
         print(password)
 
         new_encrypted_secrets = encrypt_secrets(
-            user_data["username"], password, session["s"]
+            user_data[0]["username"], password, str(session["s"])
         )
 
         db.execute(
-            "UPDATE TABLE users (s) VALUES (:s) WHERE id = :user_id;",
+            "UPDATE users SET s = :s WHERE id = :user_id;",
             user_id=session["user_id"],
             s=new_encrypted_secrets,
         )
 
-        session["p"] = encrypt(password, new_encrypted_secrets)
+        session["p"] = encrypt(password, str(new_encrypted_secrets))
         flash("Secret added successfully", "success")
         return redirect("/")
     elif request.method == "GET":

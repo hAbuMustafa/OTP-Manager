@@ -3,18 +3,18 @@ import base64
 import hashlib
 
 
-def hash(text):
+def hash(text: str):
     hashed = hashlib.sha256(text.encode()).digest()
     encoded = base64.urlsafe_b64encode(hashed)
     return encoded.decode("utf-8")
 
 
-def encrypt_secrets(username, password, text_to_encrypt=""):
+def encrypt_secrets(username: str, password: str, text_to_encrypt=""):
     fernet = Fernet(hash(password))
     return fernet.encrypt(f"{username} {text_to_encrypt}".encode())
 
 
-def decrypt_secrets(username, password, encrypted_text):
+def decrypt_secrets(username: str, password: str, encrypted_text: str):
     try:
         fernet = Fernet(hash(password))
         decrypted = fernet.decrypt(encrypted_text).decode()

@@ -22,3 +22,13 @@ def decrypt_secrets(username: str, password: str, encrypted_text: str):
         return segments[0] == username, segments[1:]
     except InvalidToken:
         return False, []
+
+
+def encrypt(text: str, key: str):
+    fernet = Fernet(hash(key))
+    return fernet.encrypt(text.encode())
+
+
+def decrypt(text: str, key: str):
+    fernet = Fernet(hash(key))
+    return fernet.decrypt(text).decode()

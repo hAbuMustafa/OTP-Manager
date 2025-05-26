@@ -11,7 +11,7 @@ def hash(text: str):
 
 def encrypt_secrets(username: str, password: str, text_to_encrypt=""):
     fernet = Fernet(hash(password))
-    return fernet.encrypt(f"{username} {text_to_encrypt}".encode())
+    return fernet.encrypt(f"{username} {text_to_encrypt}".encode()).decode()
 
 
 def decrypt_secrets(username: str, password: str, encrypted_text: str):
@@ -26,7 +26,7 @@ def decrypt_secrets(username: str, password: str, encrypted_text: str):
 
 def encrypt(text: str, key: str):
     fernet = Fernet(hash(key))
-    return fernet.encrypt(text.encode())
+    return fernet.encrypt(text.encode()).decode()
 
 
 def decrypt(text: str, key: str):

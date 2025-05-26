@@ -22,3 +22,7 @@ def logged_out_only(f):
         return f(*args, **kwargs)
 
     return decorated_function
+
+
+def print_c(message=""):
+    print(f"\033[1;32;40m{message}\033[0m")

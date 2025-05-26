@@ -1,7 +1,7 @@
 from cs50 import SQL
 from flask import Flask, flash, render_template, request, redirect, session
 from flask_session import Session
-from helpers import login_required, logged_out_only
+from helpers import login_required, logged_out_only, print_c
 from encryption import encrypt_secrets, decrypt_secrets, encrypt, decrypt
 import re
 from pyotp import TOTP, HOTP
@@ -59,7 +59,7 @@ def digest_secrets(secret: dict):
     )
 
     interval = int(secret["period"]) if secret["otp_type"] == "totp" else None
-    remaining_seconds = interval - (time() % interval) if interval else None
+    remaining_seconds = interval - (time() % interval) if interval else 100
 
     ends_at = (
         (datetime.now() + timedelta(seconds=remaining_seconds)).strftime(
@@ -91,10 +91,21 @@ def index():
             session["s"],
         )
     )
-    # todo: get the lowest "remaining_seconds" from OTPs
-    # todo: pass it as a variable to the template
-    # todo: refresh the page after that time using JS
-    return render_template("index.html", s=OTPs)
+
+    refresh_after = (
+        sorted(
+            list(
+                filter(
+                    lambda x: x is not None, OTPs
+                )  # fix: remove this when you fix the session secrets dictionary bug in the first item
+            ),
+            key=lambda x: x["remaining_seconds"] or 100,
+        )[0]["remaining_seconds"]
+        if len(OTPs) > 0
+        else None
+    )
+    # todo: refresh the page after "refresh_after" time using JS
+    return render_template("index.html", s=OTPs, refresh_after=refresh_after)
 
 
 @app.route("/login", methods=["GET", "POST"])

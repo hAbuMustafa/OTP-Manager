@@ -9,5 +9,11 @@
 {% endblock %}
 
 {% block content %}
-<!--  -->
+  {% if s|length > 0 %}
+    
+  {% else %}
+    <h2>you don't have any secrets saved yet</h2>
+  {% endif %}
+  
+  <a href="{{ url_for('add_secret' ) }}">Add a new OTP</a>
 {% endblock %}

@@ -152,7 +152,7 @@ def add_secret():
             flash("Invalid OTP type", "error")
             return render_template("add_secret.html"), 403
 
-        if algorithm not in ["SHA1", "SHA256", "SHA512"]:
+        if algorithm not in ["sha1", "sha256", "sha512"]:
             flash(
                 "Invalid algorithm chosen. Please, select from the provided list of standard algorithms",
                 "error",

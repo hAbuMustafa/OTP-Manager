@@ -9,12 +9,12 @@ def pw_hash(password):
     return encoded.decode("utf-8")
 
 
-def encrypt(username, password, text_to_encrypt=""):
+def encrypt_secrets(username, password, text_to_encrypt=""):
     fernet = Fernet(pw_hash(password))
     return fernet.encrypt(f"{username} {text_to_encrypt}".encode())
 
 
-def decrypt(username, password, encrypted_text):
+def decrypt_secrets(username, password, encrypted_text):
     try:
         fernet = Fernet(pw_hash(password))
         decrypted = fernet.decrypt(encrypted_text).decode()

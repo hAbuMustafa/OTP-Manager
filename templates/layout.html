@@ -10,12 +10,12 @@
   </head>
   <body>
     <header class="container-fluid mb-3">
-      <nav class="bg-light border navbar navbar-expand-md navbar-light">
+      <nav class="px-2 mt-1 bg-light border navbar navbar-expand-md navbar-light">
         <a class="navbar-brand" href="{{ url_for('index') }}">OTP Manager</a>
         {% if session["user_id"] %}  
           <ul class="navbar-nav me-auto mt-2">
             <li class="nav-item">
-              <a href="{{ url_for('index') }}" class="nav-link">Home</a>
+              <!-- <a href="{{ url_for('index') }}" class="nav-link">Home</a> -->
             </li>
           </ul>
           <ul class="navbar-nav ms-auto mt-2">

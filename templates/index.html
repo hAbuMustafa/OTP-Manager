@@ -46,5 +46,12 @@
         })
       })
     }
+
+    let refresh_after = parseFloat('{{ refresh_after }}');
+    if (!Number.isNaN(refresh_after)) {
+      setTimeout(() => {
+        location.reload();
+      }, (refresh_after + 1) * 1000);
+    }
   </script>
 {% endblock %}

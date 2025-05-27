@@ -104,7 +104,6 @@ def index():
         if len(OTPs) > 0
         else None
     )
-    # todo: refresh the page after "refresh_after" time using JS
     return render_template("index.html", s=OTPs, refresh_after=refresh_after)
 
 

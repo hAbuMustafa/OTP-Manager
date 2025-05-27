@@ -9,11 +9,42 @@
 {% endblock %}
 
 {% block content %}
-  {% if s|length > 0 %}
+  <div class="otps-wrapper d-flex flex-column align-items-center gap-3">
+    {% if s|length > 0 %}
+      {% for secret in s %}
+        {% if secret.otp_type=="totp" %}
+          <div class="otp-wrapper w-50 p-3 border border-primary rounded-3">
+            <h6>{{secret.issuer}}{% if secret.account %}: {{ secret.account }}{% endif %}</h6>
+            <h2 class="otp w-100 d-flex justify-content-center gap-2"><span>{{ secret.otp[:3 if secret.otp|length == 6 else 4] }}</span><span>{{ secret.otp[(3 if secret.otp|length == 6 else 4) :] }}</span></h2>
+          </div>
+        {% elif secret.otp_type=="hotp" %}
+          <div class="otp-wrapper w-50 p-3 otp-container border border-primary rounded-3">
+            <h6>{{secret.issuer}}{% if secret.account %}: {{ secret.account }}{% endif %}</h6>
+            <h2 class="otp w-100 d-flex justify-content-center gap-2"><span>{{ secret.otp[:3 if secret.otp|length == 6 else 4] }}</span><span>{{ secret.otp[(3 if secret.otp|length == 6 else 4) :] }}</span></h2>
+            <form action="{{ url_for('next_counter' ) }}" method="post">
+              <input type="hidden" name="account">
+              <input type="hidden" name="issuer">
+              <input type="number" name="count" value="{{ secret.counter }}" min="0">
+              <input type="submit" value="Generate">
+            </form>
+          </div>
+        {% endif %}
+      {% endfor %}
+    {% else %}
+      <h2>you don't have any secrets saved yet</h2>
+    {% endif %}
     
-  {% else %}
-    <h2>you don't have any secrets saved yet</h2>
-  {% endif %}
-  
-  <a href="{{ url_for('add_secret' ) }}">Add a new OTP</a>
+    <a href="{{ url_for('add_secret' ) }}" class="card-link">Add a new OTP</a>
+  </div>
+
+  <script>
+    let wrappers = document.querySelectorAll(".otps-wrapper .otp-wrapper")
+    if (wrappers.length > 0) {
+      wrappers.forEach(wrapper => {
+        wrapper.addEventListener("click", () => {
+          navigator.clipboard.writeText(wrapper.querySelector(".otp").textContent);
+        })
+      })
+    }
+  </script>
 {% endblock %}

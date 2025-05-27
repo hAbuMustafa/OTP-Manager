@@ -33,11 +33,6 @@ def after_request(response):
 
 
 def digest_secrets(secret: dict):
-    if (
-        secret == ""
-    ):  # fix: this by adding FILTERED secrets to session on LOGIN that do not contain mere strings
-        return
-
     otp = (
         TOTP(
             secret["secret_key"],
@@ -94,13 +89,11 @@ def index():
 
     refresh_after = (
         sorted(
-            list(
-                filter(
-                    lambda x: x is not None, OTPs
-                )  # fix: remove this when you fix the session secrets dictionary bug in the first item
-            ),
+            OTPs,
             key=lambda x: x["remaining_seconds"] or 100,
-        )[0]["remaining_seconds"]
+        )[
+            0
+        ]["remaining_seconds"]
         if len(OTPs) > 0
         else None
     )
@@ -134,7 +127,7 @@ def login():
             flash("Invalid username or password", "error")
             return render_template("login.html"), 403
         session["user_id"] = rows[0]["id"]
-        session["s"] = secrets
+        session["s"] = list(filter(lambda x: x not in [None, "", " "], secrets))
         session["p"] = encrypt(password, str(rows[0]["s"]))
 
         return redirect("/")

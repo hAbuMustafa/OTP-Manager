@@ -9,9 +9,9 @@
           <p class="otp w-100 d-flex justify-content-center"><span>{{ secret.otp[:3 if secret.otp|length == 6 else 4] }}</span><span>{{ secret.otp[(3 if secret.otp|length == 6 else 4) :] }}</span></p>
           {% if secret.otp_type=="hotp" %}
             <form action="{{ url_for('next_counter' ) }}" method="post">
-              <input type="hidden" name="account">
-              <input type="hidden" name="issuer">
-              <input type="number" name="count" value="{{ secret.counter }}" min="0">
+              <input type="hidden" name="account" value="{{ secret.account }}">
+              <input type="hidden" name="issuer" value="{{ secret.issuer }}">
+              <input type="number" name="count" value="{{ secret.counter }}" min="0" step="1">
               <input type="submit" value="Generate">
             </form>
           {% endif %}

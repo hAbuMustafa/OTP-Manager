@@ -1,3 +1,4 @@
+import uuid
 from cs50 import SQL
 from flask import Flask, flash, render_template, request, redirect, session
 from flask_session import Session
@@ -239,6 +240,7 @@ def add_secret():
             return render_template("add_secret.html"), 403
 
         new_secret = {
+            "id": uuid.uuid4(),
             "issuer": issuer,
             "account": account,
             "secret_key": secret,

@@ -1,12 +1,8 @@
 {% extends 'layout.html' %}
 
-{% block title %}
-  Login
-{% endblock %}
+{% set title = "Login" %}
 
-{% block heading %}
-  Login to your account
-{% endblock %}
+{% set heading = "Login to your account" %}
 
 {% block content %}
   <form action="{{ url_for('login') }}" method="post">

@@ -13,7 +13,7 @@ This app will serve as an alternative to Google Authenticator.
 - [ ] Allow export of data to a text file
 - [ ] Add QR-Code reveal button to allow import to Google Authenticator or the likes
 - [x] Allow updating counter-based tokens by the button
-- [ ] Add client-side form validation for all forms
+- [x] Add client-side form validation for all forms
 - [ ] Add a strong-password filter for user passwords
 - [ ] Add a `reset password` feature
 

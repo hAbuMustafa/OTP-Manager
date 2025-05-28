@@ -10,8 +10,8 @@
           {% if secret.otp_type=="hotp" %}
             <form action="{{ url_for('next_counter' ) }}" method="post">
               <input type="hidden" required name="id" value="{{ secret.id }}">
-              <input type="number" required name="count" value="{{ secret.counter }}" min="0" step="1">
-              <input type="submit" value="Generate">
+              <input type="number" required name="count" class="form-control" value="{{ secret.counter }}" min="0" step="1">
+              <input type="submit" class="btn btn-primary" value="Generate">
             </form>
           {% endif %}
         </div>
@@ -80,6 +80,16 @@
       &:hover {
         scale: 1.1;
         rotate: 180deg;
+      }
+    }
+
+    form {
+      display: flex;
+      gap: 1rem;
+      place-content: center;
+
+      & input[type="number"] {
+        width: 4rem;
       }
     }
   </style>

@@ -8,7 +8,7 @@
           <h2>{{secret.issuer}}{% if secret.account %}: {{ secret.account }}{% endif %}</h2>
           <p class="otp w-100 d-flex justify-content-center"><span>{{ secret.otp[:3 if secret.otp|length == 6 else 4] }}</span><span>{{ secret.otp[(3 if secret.otp|length == 6 else 4) :] }}</span></p>
           {% if secret.otp_type=="hotp" %}
-            <form action="{{ url_for('next_counter' ) }}" method="post">
+            <form action="{{ url_for('next_counter' ) }}" method="post" class="d-flex justify-content-center gap-2">
               <input type="hidden" required name="id" value="{{ secret.id }}">
               <input type="number" required name="count" class="form-control" value="{{ secret.counter }}" min="0" step="1">
               <input type="submit" class="btn btn-primary" value="Generate">
@@ -83,14 +83,8 @@
       }
     }
 
-    form {
-      display: flex;
-      gap: 1rem;
-      place-content: center;
-
-      & input[type="number"] {
-        width: 4rem;
-      }
+    form input[type="number"] {
+      width: 4rem;
     }
   </style>
 {% endblock %}

@@ -166,6 +166,12 @@ def register():
                 "error",
             )
             return render_template("register.html"), 403
+        if not re.compile("^.{8,}$").match(password):
+            flash(
+                "Password should be 6+ characters",
+                "error",
+            )
+            return render_template("register.html"), 403
 
         s = encrypt_secrets(username, password)
 

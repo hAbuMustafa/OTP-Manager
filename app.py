@@ -265,8 +265,37 @@ def add_secret():
 @app.route("/next_counter", methods=["POST"])
 @login_required
 def next_counter():
-    # todo: implement this function
-    return redirect("/")
+    secret_id = request.form.get("id")
+    count = request.form.get("count")
+
+    print_c(session["s"])
+    print_c(secret_id)
+
+    if not secret_id or not count:
+        flash("Missing required fields", "error"), 403
+        return redirect("/")
+
+    try:
+        count = int(count)
+    except ValueError:
+        flash("Invalid counter", "error")
+        return redirect("/")
+    if count < 0:
+        flash("Counter cannot be negative", "error")
+        return redirect("/")
+
+    if count % 1 != 0:
+        flash("Counter must be an integer", "error")
+        return redirect("/")
+    for secret in session["s"]:
+        if secret["id"] == secret_id:
+            secret["counter"] = count
+            save_updated_secrets()
+            flash("Counter updated successfully", "success")
+            return redirect("/")
+    else:
+        flash("Secret not found", "error")
+        return redirect("/")
 
 
 def save_updated_secrets():

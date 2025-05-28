@@ -30,6 +30,13 @@
       wrappers.forEach(wrapper => {
         wrapper.addEventListener("click", () => {
           navigator.clipboard.writeText(wrapper.querySelector(".otp").textContent);
+          if ("Notification" in window) {
+            Notification.requestPermission().then(permission => {
+              if (permission === "granted") {
+                new Notification(`OTP '${wrapper.querySelector(".otp").textContent}' copied to clipboard!`);
+              }
+            });
+          }
         })
       })
     }
@@ -62,9 +69,9 @@
     .fab {
       position: fixed;
       inset: auto 2rem 2rem auto;
-      width: 3rem;
-      height: 3rem;
-      font-size: 2rem;
+      width: 4rem;
+      height: 4rem;
+      font-size: 2.7rem;
       border-radius: 50%;
       box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
       transition: all 0.3s ease-in-out;

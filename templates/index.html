@@ -4,23 +4,18 @@
   <div class="otps-wrapper d-flex flex-column align-items-center gap-3">
     {% if s|length > 0 %}
       {% for secret in s %}
-        {% if secret.otp_type=="totp" %}
-          <div class="otp-wrapper w-75 p-3 border border-primary rounded-3">
-            <h2>{{secret.issuer}}{% if secret.account %}: {{ secret.account }}{% endif %}</h2>
-            <p class="otp w-100 d-flex justify-content-center"><span>{{ secret.otp[:3 if secret.otp|length == 6 else 4] }}</span><span>{{ secret.otp[(3 if secret.otp|length == 6 else 4) :] }}</span></p>
-          </div>
-        {% elif secret.otp_type=="hotp" %}
-          <div class="otp-wrapper w-75 p-3 border border-primary rounded-3">
-            <h2>{{secret.issuer}}{% if secret.account %}: {{ secret.account }}{% endif %}</h2>
-            <p class="otp w-100 d-flex justify-content-center"><span>{{ secret.otp[:3 if secret.otp|length == 6 else 4] }}</span><span>{{ secret.otp[(3 if secret.otp|length == 6 else 4) :] }}</span></p>
+        <div class="otp-wrapper w-75 p-3 border border-primary rounded-3">
+          <h2>{{secret.issuer}}{% if secret.account %}: {{ secret.account }}{% endif %}</h2>
+          <p class="otp w-100 d-flex justify-content-center"><span>{{ secret.otp[:3 if secret.otp|length == 6 else 4] }}</span><span>{{ secret.otp[(3 if secret.otp|length == 6 else 4) :] }}</span></p>
+          {% if secret.otp_type=="hotp" %}
             <form action="{{ url_for('next_counter' ) }}" method="post">
               <input type="hidden" name="account">
               <input type="hidden" name="issuer">
               <input type="number" name="count" value="{{ secret.counter }}" min="0">
               <input type="submit" value="Generate">
             </form>
-          </div>
-        {% endif %}
+          {% endif %}
+        </div>
       {% endfor %}
     {% else %}
       <h2>you don't have any secrets saved yet</h2>

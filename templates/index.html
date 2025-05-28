@@ -24,11 +24,11 @@
   </div>
 
   <script>
-    let wrappers = document.querySelectorAll(".otps-wrapper .otp-wrapper")
+    let wrappers = document.querySelectorAll(".otps-wrapper .otp-wrapper p.otp")
     if (wrappers.length > 0) {
       wrappers.forEach(wrapper => {
         wrapper.addEventListener("click", () => {
-          const otp = wrapper.querySelector(".otp").textContent;
+          const otp = wrapper.textContent;
           navigator.clipboard.writeText(otp);
           if ("Notification" in window) {
             Notification.requestPermission().then(permission => {

@@ -306,12 +306,12 @@ def next_counter():
         return redirect("/")
 
 
-def save_updated_secrets():
+def save_updated_secrets(password=""):
     user_data = db.execute(
         "SELECT * FROM users WHERE id = :user_id;", user_id=session["user_id"]
     )
-
-    password = decrypt(session["p"], str(user_data[0]["s"]))
+    if password == "":
+        password = decrypt(session["p"], str(user_data[0]["s"]))
 
     new_encrypted_secrets = encrypt_secrets(
         user_data[0]["username"], password, str(session["s"])
@@ -342,3 +342,69 @@ def delete_secret():
     else:
         flash("Secret not found", "error")
         return redirect("/")
+
+
+@app.route("/account", methods=["GET"])
+@login_required
+def account():
+    rows = db.execute(
+        "SELECT * FROM users WHERE id = :user_id;", user_id=session["user_id"]
+    )
+    return render_template("account.html", username=rows[0]["username"])
+
+
+@app.route("/change_username", methods=["POST"])
+@login_required
+def change_username():
+    username = request.form.get("username")
+    if not username:
+        flash("Missing required fields", "error"), 403
+        return redirect("/account")
+
+    if not re.compile("^[A-Za-z][A-Za-z0-9_]{4,}$").match(username):
+        flash(
+            "Username should be: 5+ characters, and contains only characters and digits and underscores",
+            "error",
+        ), 403
+        return redirect("/account")
+
+    db.execute(
+        "UPDATE users SET username = :username WHERE id = :user_id;",
+        username=username,
+        user_id=session["user_id"],
+    )
+
+    flash("Username changed successfully", "success")
+    return redirect("/account")
+
+
+@app.route("/change_password", methods=["POST"])
+@login_required
+def change_password():
+    old_password = request.form.get("old_password")
+    new_password = request.form.get("new_password")
+    confirm_password = request.form.get("confirm_new_password")
+    if not old_password or not new_password or not confirm_password:
+        flash(
+            "Please, fill in the passwords in order to change the old password", "error"
+        ), 403
+        return redirect("/account")
+
+    userdata = db.execute(
+        "SELECT * FROM users WHERE id = :user_id;", user_id=session["user_id"]
+    )
+
+    curr_password = decrypt(session["p"], str(userdata[0]["s"]))
+
+    if curr_password != old_password:
+        flash("Old password is incorrect", "error"), 403
+        return redirect("/account")
+
+    if new_password != confirm_password:
+        flash("Passwords do not match", "error"), 403
+        return redirect("/account")
+
+    save_updated_secrets(new_password)
+
+    flash("Password changed successfully", "success")
+    return redirect("/account")

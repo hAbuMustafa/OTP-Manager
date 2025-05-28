@@ -1,0 +1,39 @@
+{% extends 'layout.html' %}
+
+{% set title = "Account" %}
+
+{% set heading = "Account Information" %}
+
+{% block content %}
+  <form action="{{ url_for('change_username') }}" method="post" class="d-flex align-items-center gap-2">
+    <div>
+      <input type="text" name="username" placeholder="Username" class="form-control" pattern="^[A-Za-z][A-Za-z0-9_]{4,}$" title="Username should be: 5+ characters, and contains only characters and digits and underscores" value="{{ username }}" required autofocus />
+    </div>
+    <input type="submit" class="btn btn-primary" value="Change Username">
+  </form>
+  <hr>
+  <form action="{{ url_for('change_password') }}" method="post" class="d-flex align-items-center gap-2">
+    <div>
+      <input required type="password" class="form-control" name="old_password" placeholder="Old Password">
+      <input required type="password" class="form-control" name="new_password" placeholder="New Password" pattern=".{6,}">
+      <input required type="password" class="form-control" name="confirm_new_password" placeholder="Confirm Password" pattern=".{6,}">
+    </div>
+    <input type="submit" class="btn btn-primary" value="Change Password">
+  </form>
+
+  <script>
+    const pwInputs = document.querySelectorAll('[name*="new_password"]');
+    const form = document.querySelector('form');
+    pwInputs.forEach(input => {
+      input.addEventListener('input', () => {
+        if (pwInputs[0].value === pwInputs[1].value) {
+          pwInputs.forEach(input => input.classList.remove('is-invalid'));
+          pwInputs.forEach(input => input.classList.add('is-valid'));
+        } else {
+          pwInputs.forEach(input => input.classList.add('is-invalid'));
+          pwInputs.forEach(input => input.classList.remove('is-valid'));
+        }
+      });
+    });
+</script>
+{% endblock %}

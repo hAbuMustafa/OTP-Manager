@@ -7,15 +7,11 @@ This app will serve as an alternative to Google Authenticator.
 - [x] Save secrets encrypted to generate 2FA codes
 - [x] display OTP tokens for each account
 - [x] Allow adding new accounts
-- [ ] Allow editing of accounts
+- [x] Allow editing of accounts
 - [x] all stored data are encrypted by user's password
-- [ ] Allow import of data from a text file
-- [ ] Allow export of data to a text file
-- [ ] Add QR-Code reveal button to allow import to Google Authenticator or the likes
 - [x] Allow updating counter-based tokens by the button
 - [x] Add client-side form validation for all forms
-- [ ] Add a strong-password filter for user passwords
-- [ ] Add a `reset password` feature
+- [x] Add a strong-password filter for user passwords
 
 ## Flow
 

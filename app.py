@@ -240,7 +240,7 @@ def add_secret():
             return render_template("add_secret.html"), 403
 
         new_secret = {
-            "id": uuid.uuid4(),
+            "id": uuid.uuid4().hex,
             "issuer": issuer,
             "account": account,
             "secret_key": secret,

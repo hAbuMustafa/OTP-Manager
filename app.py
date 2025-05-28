@@ -7,6 +7,7 @@ import re
 from pyotp import TOTP, HOTP
 from time import time
 from datetime import datetime, timedelta
+import ast
 
 app = Flask(__name__)
 
@@ -127,7 +128,7 @@ def login():
             flash("Invalid username or password", "error")
             return render_template("login.html"), 403
         session["user_id"] = rows[0]["id"]
-        session["s"] = list(filter(lambda x: x not in [None, "", " "], secrets))
+        session["s"] = ast.literal_eval(secrets)
         session["p"] = encrypt(password, str(rows[0]["s"]))
 
         return redirect("/")

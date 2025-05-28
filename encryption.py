@@ -11,7 +11,7 @@ def hash(text: str):
 
 def encrypt_secrets(username: str, password: str, text_to_encrypt=""):
     fernet = Fernet(hash(password))
-    return fernet.encrypt(f"{username} {text_to_encrypt}".encode()).decode()
+    return fernet.encrypt(f"{username} {text_to_encrypt}".strip().encode()).decode()
 
 
 def decrypt_secrets(username: str, password: str, encrypted_text: str):
@@ -19,9 +19,11 @@ def decrypt_secrets(username: str, password: str, encrypted_text: str):
         fernet = Fernet(hash(password))
         decrypted = fernet.decrypt(encrypted_text).decode()
         segments = decrypted.split(" ")
-        return segments[0] == username, segments[1:]
+        return segments[0] == username, (
+            "".join(segments[1:]) if len(segments) > 1 else "[]"
+        )
     except InvalidToken:
-        return False, []
+        return False, "[]"
 
 
 def encrypt(text: str, key: str):

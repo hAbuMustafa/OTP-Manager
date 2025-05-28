@@ -69,6 +69,7 @@ def digest_secrets(secret: dict):
     counter = int(secret["counter"]) if secret["otp_type"] == "hotp" else None
 
     return {
+        "id": secret["id"],
         "issuer": secret["issuer"],
         "account": secret["account"],
         "otp_type": secret["otp_type"],

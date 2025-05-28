@@ -18,7 +18,7 @@
         </div>
       {% endfor %}
     {% else %}
-      <h2>you don't have any secrets saved yet</h2>
+      <h2>You don't have any secrets saved yet. <a href="{{ url_for('add_secret' ) }}">Add one...</a></h2>
     {% endif %}
     
     <a href="{{ url_for('add_secret' ) }}" class="fab bg-primary text-light" title="Add a new OTP">+</a>

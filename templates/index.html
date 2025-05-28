@@ -9,14 +9,14 @@
     {% if s|length > 0 %}
       {% for secret in s %}
         {% if secret.otp_type=="totp" %}
-          <div class="otp-wrapper w-50 p-3 border border-primary rounded-3">
-            <h6>{{secret.issuer}}{% if secret.account %}: {{ secret.account }}{% endif %}</h6>
-            <h2 class="otp w-100 d-flex justify-content-center gap-2"><span>{{ secret.otp[:3 if secret.otp|length == 6 else 4] }}</span><span>{{ secret.otp[(3 if secret.otp|length == 6 else 4) :] }}</span></h2>
+          <div class="otp-wrapper w-75 p-3 border border-primary rounded-3">
+            <h2>{{secret.issuer}}{% if secret.account %}: {{ secret.account }}{% endif %}</h2>
+            <p class="otp w-100 d-flex justify-content-center"><span>{{ secret.otp[:3 if secret.otp|length == 6 else 4] }}</span><span>{{ secret.otp[(3 if secret.otp|length == 6 else 4) :] }}</span></p>
           </div>
         {% elif secret.otp_type=="hotp" %}
-          <div class="otp-wrapper w-50 p-3 otp-container border border-primary rounded-3">
-            <h6>{{secret.issuer}}{% if secret.account %}: {{ secret.account }}{% endif %}</h6>
-            <h2 class="otp w-100 d-flex justify-content-center gap-2"><span>{{ secret.otp[:3 if secret.otp|length == 6 else 4] }}</span><span>{{ secret.otp[(3 if secret.otp|length == 6 else 4) :] }}</span></h2>
+          <div class="otp-wrapper w-75 p-3 border border-primary rounded-3">
+            <h2>{{secret.issuer}}{% if secret.account %}: {{ secret.account }}{% endif %}</h2>
+            <p class="otp w-100 d-flex justify-content-center"><span>{{ secret.otp[:3 if secret.otp|length == 6 else 4] }}</span><span>{{ secret.otp[(3 if secret.otp|length == 6 else 4) :] }}</span></p>
             <form action="{{ url_for('next_counter' ) }}" method="post">
               <input type="hidden" name="account">
               <input type="hidden" name="issuer">
@@ -50,4 +50,22 @@
       }, (refresh_after + 1) * 1000);
     }
   </script>
+
+  <style>
+    h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    p.otp {
+      font-size: 3.5rem;
+      font-weight: 600;
+      font-family: monospace;
+      line-height: .9;
+
+      & span:not(:first-of-type)::before{
+        content: "-";
+      }
+    }
+  </style>
 {% endblock %}

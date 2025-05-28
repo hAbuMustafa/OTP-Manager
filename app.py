@@ -251,25 +251,10 @@ def add_secret():
             "counter": counter,
         }
 
-        user_data = db.execute(
-            "SELECT * FROM users WHERE id = :user_id;", user_id=session["user_id"]
-        )
-
         session["s"].append(new_secret)
 
-        password = decrypt(session["p"], str(user_data[0]["s"]))
+        save_updated_secrets()
 
-        new_encrypted_secrets = encrypt_secrets(
-            user_data[0]["username"], password, str(session["s"])
-        )
-
-        db.execute(
-            "UPDATE users SET s = :s WHERE id = :user_id;",
-            user_id=session["user_id"],
-            s=new_encrypted_secrets,
-        )
-
-        session["p"] = encrypt(password, str(new_encrypted_secrets))
         flash("Secret added successfully", "success")
         return redirect("/")
     elif request.method == "GET":
@@ -281,3 +266,23 @@ def add_secret():
 def next_counter():
     # todo: implement this function
     return redirect("/")
+
+
+def save_updated_secrets():
+    user_data = db.execute(
+        "SELECT * FROM users WHERE id = :user_id;", user_id=session["user_id"]
+    )
+
+    password = decrypt(session["p"], str(user_data[0]["s"]))
+
+    new_encrypted_secrets = encrypt_secrets(
+        user_data[0]["username"], password, str(session["s"])
+    )
+
+    db.execute(
+        "UPDATE users SET s = :s WHERE id = :user_id;",
+        user_id=session["user_id"],
+        s=new_encrypted_secrets,
+    )
+
+    session["p"] = encrypt(password, str(new_encrypted_secrets))

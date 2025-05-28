@@ -324,3 +324,21 @@ def save_updated_secrets():
     )
 
     session["p"] = encrypt(password, str(new_encrypted_secrets))
+
+
+@app.route("/delete_secret", methods=["POST"])
+@login_required
+def delete_secret():
+    secret_id = request.form.get("id")
+    if not secret_id:
+        flash("Missing required fields", "error"), 403
+        return redirect("/")
+    for secret in session["s"]:
+        if secret["id"] == secret_id:
+            session["s"].remove(secret)
+            save_updated_secrets()
+            flash("Secret deleted successfully", "success")
+            return redirect("/")
+    else:
+        flash("Secret not found", "error")
+        return redirect("/")

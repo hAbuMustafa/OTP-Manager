@@ -4,8 +4,14 @@
   <div class="otps-wrapper d-flex flex-column align-items-center gap-3">
     {% if s|length > 0 %}
       {% for secret in s %}
-        <div class="otp-wrapper w-75 p-3 border border-primary rounded-3">
+        <div class="otp-wrapper w-75 p-3 border border-primary rounded-3 position-relative">
           <h2>{{secret.issuer}}{% if secret.account %}: {{ secret.account }}{% endif %}</h2>
+          <div class="otp-actions">
+            <form action="{{ url_for('delete_secret') }}" method="post">
+              <input type="hidden" name="id" value="{{ secret.id }}">
+              <input type="submit" aria-label="delete OTP" class="delete-secret" value="❌">
+            </form>
+          </div>
           <p class="otp w-100 d-flex justify-content-center"><span>{{ secret.otp[:3 if secret.otp|length == 6 else 4] }}</span><span>{{ secret.otp[(3 if secret.otp|length == 6 else 4) :] }}</span></p>
           {% if secret.otp_type=="hotp" %}
             <form action="{{ url_for('next_counter' ) }}" method="post" class="d-flex justify-content-center gap-2">
@@ -85,6 +91,21 @@
 
     form input[type="number"] {
       width: 4rem;
+    }
+
+    .otp-actions {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+
+      position: absolute;
+      inset: .75rem 1rem auto auto;
+
+      & [type="submit"] {
+        background: none;
+        border: none;
+        cursor: pointer;
+      }
     }
   </style>
 {% endblock %}

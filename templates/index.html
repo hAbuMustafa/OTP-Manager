@@ -29,11 +29,12 @@
     if (wrappers.length > 0) {
       wrappers.forEach(wrapper => {
         wrapper.addEventListener("click", () => {
-          navigator.clipboard.writeText(wrapper.querySelector(".otp").textContent);
+          const otp = wrapper.querySelector(".otp").textContent;
+          navigator.clipboard.writeText(otp);
           if ("Notification" in window) {
             Notification.requestPermission().then(permission => {
               if (permission === "granted") {
-                new Notification(`OTP '${wrapper.querySelector(".otp").textContent}' copied to clipboard!`);
+                new Notification(`OTP '${otp}' copied to clipboard!`);
               }
             });
           }

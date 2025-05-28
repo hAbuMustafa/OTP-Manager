@@ -108,14 +108,14 @@ def index():
 def login():
     if request.method == "POST":
         session.clear()
-        username = request.form.get("username")
+        username = request.form.get("username").strip()
         password = request.form.get("password")
         if not username or not password:
             flash("Please provide a username and password", "error")
             return render_template("login.html"), 403
 
         rows = db.execute(
-            "SELECT * FROM users WHERE username = :username;",
+            "SELECT * FROM users WHERE username = :username COLLATE NOCASE;",
             username=username,
         )
 
@@ -125,7 +125,9 @@ def login():
 
         # Decrypt secrets, if the the first return is True, then redirect to the Home page and forward decrypted secrets to the Home page, otherwise, redirect to the login page with error message
 
-        user_matched, secrets = decrypt_secrets(username, password, str(rows[0]["s"]))
+        user_matched, secrets = decrypt_secrets(
+            str(rows[0]["username"]), password, str(rows[0]["s"])
+        )
         if not user_matched:
             flash("Invalid username or password", "error")
             return render_template("login.html"), 403

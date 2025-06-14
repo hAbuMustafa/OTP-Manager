@@ -75,6 +75,7 @@ def digest_secrets(secret: dict):
         "otp_type": secret["otp_type"],
         "otp": otp,
         "ends_at": ends_at,
+        "interval": interval,
         "remaining_seconds": remaining_seconds,
         "counter": counter,
     }

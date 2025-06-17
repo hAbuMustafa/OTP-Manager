@@ -1,30 +1,11 @@
+{% import 'macros/otp-card.html.j2' as otp_card   %}
 {% extends 'layout.html' %}
 
 {% block content %}
   <div class="otps-wrapper d-flex flex-column align-items-center gap-3">
     {% if s|length > 0 %}
       {% for secret in s %}
-        <div class="otp-wrapper w-75 p-3 border border-primary rounded-3 position-relative">
-          <h2>{{secret.issuer}}{% if secret.account %}: {{ secret.account }}{% endif %}</h2>
-          <div class="otp-actions">
-            <form action="{{ url_for('delete_secret') }}" method="post">
-              <input type="hidden" name="id" value="{{ secret.id }}">
-              <input type="submit" aria-label="delete OTP" class="delete-secret" value="❌">
-            </form>
-          </div>
-          <p class="otp w-100 d-flex justify-content-center"><span>{{ secret.otp[:3 if secret.otp|length == 6 else 4] }}</span><span>{{ secret.otp[(3 if secret.otp|length == 6 else 4) :] }}</span></p>
-          {% if secret.otp_type=="hotp" %}
-            <form action="{{ url_for('next_counter' ) }}" method="post" class="d-flex justify-content-center gap-2">
-              <input type="hidden" required name="id" value="{{ secret.id }}">
-              <input type="number" required name="count" class="form-control" value="{{ secret.counter }}" min="0" step="1">
-              <input type="submit" class="btn btn-primary" value="Generate">
-            </form>
-          {% elif secret.otp_type == "totp" %}
-              <div class="progress">
-                <div class="progress-bar" role="progressbar" style="width: {{ ((secret.remaining_seconds/secret.interval) * 100) | round(2, 'common') }}%; --start-time: {{ (secret.remaining_seconds + 1) | round(3, 'floor') }}s;" aria-valuemin="0" aria-valuemax="{{ secret.interval }}"></div>
-              </div>
-          {% endif %}
-        </div>
+        {{ otp_card.card(secret)}}
       {% endfor %}
     {% else %}
       <h2>You don't have any secrets saved yet. <a href="{{ url_for('add_secret' ) }}">Add one...</a></h2>

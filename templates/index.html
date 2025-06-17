@@ -21,7 +21,7 @@
             </form>
           {% elif secret.otp_type == "totp" %}
               <div class="progress">
-                <div class="progress-bar" role="progressbar" style="width: {{ (secret.remaining_seconds/secret.interval)*100 | round }}%; --start-time: {{ secret.remaining_seconds }}s;" aria-valuemin="0" aria-valuemax="{{ secret.interval }}"></div>
+                <div class="progress-bar" role="progressbar" style="width: {{ (secret.remaining_seconds/secret.interval)*100 | round }}%; --start-time: {{ secret.remaining_seconds + 1 }}s;" aria-valuemin="0" aria-valuemax="{{ secret.interval }}"></div>
               </div>
           {% endif %}
         </div>

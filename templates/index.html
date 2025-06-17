@@ -20,7 +20,9 @@
               <input type="submit" class="btn btn-primary" value="Generate">
             </form>
           {% elif secret.otp_type == "totp" %}
-              <progress value="{{ secret.remaining_seconds }}" max="{{ secret.interval }}" class="progress w-100"></progress>
+              <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width: {{ (secret.remaining_seconds/secret.interval)*100 | round }}%; --start-time: {{ secret.remaining_seconds }}s;" aria-valuemin="0" aria-valuemax="{{ secret.interval }}"></div>
+              </div>
           {% endif %}
         </div>
       {% endfor %}
@@ -55,15 +57,6 @@
         location.reload();
       }, (refresh_after + 1) * 1000);
     }
-
-    setInterval(() => {
-      let progress = document.querySelectorAll(".otps-wrapper .otp-wrapper progress");
-      if (progress.length > 0) {
-        progress.forEach(progress => {
-          progress.value = progress.value - 1;
-        })
-      }
-    }, 1000);
   </script>
 
   <style>
@@ -116,6 +109,16 @@
         background: none;
         border: none;
         cursor: pointer;
+      }
+    }
+
+    .progress-bar {
+      animation: timeout var(--start-time) linear forwards;
+    }
+
+    @keyframes timeout {
+      to {
+        width: 0%;
       }
     }
   </style>

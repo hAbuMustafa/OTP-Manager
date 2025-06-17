@@ -46,17 +46,6 @@
       font-weight: 600;
     }
 
-    p.otp {
-      font-size: 3.5rem;
-      font-weight: 600;
-      font-family: monospace;
-      line-height: .9;
-
-      & span:not(:first-of-type)::before{
-        content: "-";
-      }
-    }
-
     .fab {
       position: fixed;
       inset: auto 2rem 2rem auto;
@@ -74,11 +63,22 @@
       }
     }
 
-    form input[type="number"] {
+    .otp-wrapper p.otp {
+      font-size: 3.5rem;
+      font-weight: 600;
+      font-family: monospace;
+      line-height: .9;
+
+      & span:not(:first-of-type)::before{
+        content: "-";
+      }
+    }
+
+    .otp-wrapper form input[type="number"] {
       width: 4rem;
     }
 
-    .otp-actions {
+    .otp-wrapper .otp-actions {
       display: flex;
       justify-content: center;
       gap: 1rem;
@@ -93,7 +93,7 @@
       }
     }
 
-    .progress-bar {
+    .otp-wrapper .progress-bar {
       animation: timeout var(--start-time) linear forwards;
     }
 
